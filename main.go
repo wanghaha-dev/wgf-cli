@@ -10,6 +10,16 @@ import (
 )
 
 func main() {
+	if exists, err := checkLsExists("gox"); err != nil || !exists {
+		fmt.Println("exec => go install github.com/mitchellh/gox@latest")
+		Exec2("go", "install", "github.com/mitchellh/gox@latest")
+	}
+
+	if exists, err := checkLsExists("air"); err != nil || !exists {
+		fmt.Println("exec => go install github.com/air-verse/air@latest")
+		Exec2("go", "install", "github.com/air-verse/air@latest")
+	}
+
 	args := os.Args
 
 	if len(args) == 1 {
@@ -72,4 +82,14 @@ func Exec2(name string, args ...string) {
 
 func initTpl() {
 	Exec2("git", "clone", "https://gitee.com/develop1024/gfproject-tpl.git")
+}
+
+func checkLsExists(cmd string) (bool, error) {
+	path, err := exec.LookPath(cmd)
+	if err != nil {
+		return false, err
+	}
+
+	fmt.Println("gox ok =>", path)
+	return true, nil
 }
