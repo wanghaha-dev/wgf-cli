@@ -13,15 +13,18 @@ func main() {
 	args := os.Args
 
 	if len(args) == 1 {
-		fmt.Println("Please choose build or run.")
+		fmt.Println("Please choose build or run or init.")
 		return
 	}
 
 	arg := args[1]
-	if arg == "build" {
+	switch arg {
+	case "build":
 		build()
-	} else if arg == "run" {
+	case "run":
 		Exec2("air")
+	case "init":
+		initTpl()
 	}
 }
 
@@ -62,4 +65,8 @@ func Exec2(name string, args ...string) {
 	if err != nil {
 		log.Fatalf("cmd.Run() failed with %s\n", err)
 	}
+}
+
+func initTpl() {
+	Exec2("git", "clone", "https://gitee.com/develop1024/gfproject-tpl.git")
 }
