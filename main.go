@@ -45,6 +45,9 @@ func build() {
 		// gox -osarch="linux/amd64" -output=bin/v1.0.0/linux_amd64/new-upload-gf
 		Exec("gox", "-osarch", osarch, "-output", out)
 	}
+
+	fmt.Println("==========> done!")
+	// go build -o ~/go/bin/wgf .
 }
 
 func Exec(name string, args ...string) {
