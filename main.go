@@ -43,20 +43,49 @@ func build() {
 	output := g.Cfg().GetString("gfcli.build.output")
 	version := g.Cfg().GetString("gfcli.build.version")
 	arch := g.Cfg().GetString("gfcli.build.arch")
-	systems := g.Cfg().GetString("gfcli.build.system")
+	system := g.Cfg().GetString("gfcli.build.system")
 
-	systemSlice := strings.Split(systems, ",")
+	if !strings.Contains(system, ",") {
+		if system == "all" {
+			system = "linux,darwin,windows"
+		}
+	}
+	systemSlice := strings.Split(system, ",")
 
-	for _, item := range systemSlice {
-		out := fmt.Sprintf("%v/%v/%v_%v/%v", output, version, item, arch, name)
+	if !strings.Contains(arch, ",") {
+		if arch == "all" {
+			arch = "amd64,arm"
+		}
+	}
+	archSlice := strings.Split(arch, ",")
+	var outSlice []string
 
-		osarch := fmt.Sprintf("%v/%v", item, arch)
+	for _, systemItem := range systemSlice {
 
-		// gox -osarch="linux/amd64" -output=bin/v1.0.0/linux_amd64/new-upload-gf
-		Exec("gox", "-osarch", osarch, "-output", out)
+		for _, archItem := range archSlice {
+			if systemItem == "darwin" && archItem == "arm" {
+				continue
+			}
+			if systemItem == "windows" && archItem == "arm" {
+				continue
+			}
+
+			out := fmt.Sprintf("%v/%v/%v_%v/%v", output, version, systemItem, archItem, name)
+			osarch := fmt.Sprintf("%v/%v", systemItem, archItem)
+
+			outSlice = append(outSlice, out)
+
+			// gox -osarch="linux/amd64" -output=bin/v1.0.0/linux_amd64/new-upload-gf
+			fmt.Println("gox", "-osarch", osarch, "-output", out)
+			Exec("gox", "-osarch", osarch, "-output", out)
+		}
+
 	}
 
 	fmt.Println("==========> done!")
+	for _, item := range outSlice {
+		fmt.Println(item)
+	}
 	// go build -o ~/go/bin/wgf .
 }
 
@@ -90,6 +119,6 @@ func checkLsExists(cmd string) (bool, error) {
 		return false, err
 	}
 
-	fmt.Println("gox ok =>", path)
+	fmt.Println(cmd, "Found =>", path)
 	return true, nil
 }
